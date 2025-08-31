@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Cụ Dịch Tiếng Trung từ Hình Ảnh</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --light-color: #f9f9f9;
+            --dark-color: #333;
+            --border-color: #ddd;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .upload-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--light-color);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px dashed var(--border-color);
+        }
+        
+        .results-section {
+            flex: 2;
+            min-width: 500px;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        
+        .drop-area {
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .drop-area:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .drop-area i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            display: inline-block;
+            margin: 5px;
+        }
+        
+        .button:hover {
+            background-color: #2980b9;
+        }
+        
+        .button.secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .button.secondary:hover {
+            background-color: #27ae60;
+        }
+        
+        .button.accent {
+            background-color: var(--accent-color);
+        }
+        
+        .button.accent:hover {
+            background-color: #c0392b;
+        }
+        
+        .file-list {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        .file-item {
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .results-container {
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            background-color: var(--light-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .filename {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+        
+        .text-block {
+            margin-bottom: 15px;
+        }
+        
+        .text-label {
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+        
+        .text-content {
+            padding: 10px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            min-height: 50px;
+            margin-bottom: 10px;
+            position: relative;
+            white-space: pre-wrap;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 3px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .export-section {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .progress-bar {
+            height: 5px;
+            background-color: var(--border-color);
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--secondary-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .language-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            color: white;
+        }
+        
+        .chinese-tag { background-color: #e74c3c; }
+        .english-tag { background-color: #3498db; }
+        .vietnamese-tag { background-color: #2ecc71; }
+        
+        /* Thêm style cho hình ảnh */
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .no-chinese-message {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid #ffeeba;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content { flex-direction: column; }
+            .upload-section, .results-section { width: 100%; }
+        }
+    
+        .api-status.success{color:#2ecc71}
+        .api-status.error{color:#e74c3c}
+        .api-status.testing{color:#f39c12}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Công Cụ Dịch Tiếng Trung từ Hình Ảnh</h1>
+            <p class="description">Tìm và dịch văn bản tiếng Trung trong hình ảnh sang tiếng Anh và tiếng Việt bằng Custom AI API</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="upload-section">
+                <h2 class="section-title">Thêm Hình Ảnh</h2>
+                <div class="drop-area" id="dropArea">
+                    <i>📁</i>
+                    <p>Kéo và thả thư mục hoặc hình ảnh vào đây</p>
+                    <p>hoặc</p>
+                    <button class="button" id="browseButton">Duyệt thư mục</button>
+                </div>
+                <div class="api-box" style="margin-top:14px;border:1px solid #ddd;padding:10px;border-radius:6px;background:#fff">
+                  <div style="margin-bottom:8px;font-size:.95rem;color:#333">Cấu hình AI dịch qua API</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                    <input id="apiEndpoint" style="flex:1;min-width:260px;padding:8px" placeholder="Endpoint" value="http://172.25.94.218:1234/api/v0/chat/completions" />
+                    <input id="apiModel" style="width:260px;padding:8px" placeholder="Model" value="google/gemma-3-12b" />
+                    <input id="apiKey" style="width:220px;padding:8px" placeholder="API key (nếu có)" />
+                    <button id="testApiBtn" class="button">🧪 Test API</button>
+                  </div>
+                  <div id="apiStatus" class="api-status" style="margin-top:6px; font-size:.9rem; opacity:.8">Chưa kiểm tra</div>
+                </div>
+                
+                <div class="actions" style="margin-top:15px;">
+                    <button class="button secondary" id="processButton">Xử lý hình ảnh</button>
+                    <button class="button accent" id="clearButton">Xóa tất cả</button>
+                </div>
+                
+                <h3>Danh sách file</h3>
+                <div class="file-list" id="fileList">
+                    <p class="empty-message">Chưa có file nào được thêm vào</p>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <h2 class="section-title">Kết quả dịch</h2>
+                <div class="results-container" id="resultsContainer">
+                    <p class="empty-message">Kết quả dịch sẽ hiển thị ở đây</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="export-section">
+            <button class="button secondary" id="exportButton">Xuất ra file Excel</button>
+            <p>Xuất tất cả dữ liệu đã dịch sang định dạng Excel</p>
+        </div>
+    </div>
+
+<!-- Excel -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Default model
+  const defaultModel = 'google/gemma-3-12b';
+
+  // UI
+  const dropArea = document.getElementById('dropArea');
+  const browseButton = document.getElementById('browseButton');
+  const processButton = document.getElementById('processButton');
+  const clearButton = document.getElementById('clearButton');
+  const exportButton = document.getElementById('exportButton');
+  const fileList = document.getElementById('fileList');
+  const resultsContainer = document.getElementById('resultsContainer');
+  const progressBar = document.getElementById('progressBar');
+  // API config
+  const apiEndpointInput = document.getElementById('apiEndpoint');
+  const apiModelInput = document.getElementById('apiModel');
+  const apiKeyInput = document.getElementById('apiKey');
+  const testApiBtn = document.getElementById('testApiBtn');
+  const apiStatus = document.getElementById('apiStatus');
+
+  function getCurrentAPISettings() {
+    return {
+      endpoint: (apiEndpointInput?.value || '').trim(),
+      model: (apiModelInput?.value || defaultModel).trim(),
+      key: (apiKeyInput?.value || '').trim()
+    };
+  }
+
+  (function loadSavedApiConfig(){
+    try {
+      const ep = localStorage.getItem('ai_endpoint');
+      const model = localStorage.getItem('ai_model') || defaultModel;
+      const key = localStorage.getItem('ai_key');
+      if (ep && apiEndpointInput) apiEndpointInput.value = ep;
+      if (apiModelInput) apiModelInput.value = model;
+      if (key && apiKeyInput) apiKeyInput.value = key;
+    } catch(e){ console.warn('Cannot load saved API config', e); }
+  })();
+
+  function saveAPISettingsToStorage() {
+    try {
+      if (apiEndpointInput) localStorage.setItem('ai_endpoint', apiEndpointInput.value.trim());
+      if (apiModelInput) localStorage.setItem('ai_model', apiModelInput.value.trim() || defaultModel);
+      if (apiKeyInput) localStorage.setItem('ai_key', apiKeyInput.value.trim());
+    } catch(e){ console.warn('Cannot save API config', e); }
+  }
+
+  // Giữ nguyên endpoint nếu đã có /chat/completions; chỉ tự bù khi người dùng nhập base host
+  function normalizeChatCompletionEndpoint(ep) {
+    let url = (ep || '').trim();
+    if (!url) return 'http://172.25.94.218:1234/v1/chat/completions';
+    if (/\/chat\/completions(\?|$)/.test(url)) return url;
+    try {
+      const u = new URL(url);
+      if (u.pathname === '/' || u.pathname === '') {
+        u.pathname = '/v1/chat/completions';
+        return u.toString().replace(/\/+$/,'');
+      }
+      return url.replace(/\/+$/,'');
+    } catch {
+      return url.replace(/\/+$/,'') + '/v1/chat/completions';
+    }
+  }
+
+  // Helper timeout dùng chung
+  function withTimeout(promise, ms, abortController) {
+    let t;
+    const timeout = new Promise((_, reject) => {
+      t = setTimeout(() => {
+        try { abortController?.abort(); } catch(e){}
+        reject(new Error(`timeout after ${ms}ms`));
+      }, ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(t));
+  }
+
+  async function testAPIConnection() {
+    const btn = testApiBtn;
+    try {
+      if (!btn) return;
+      btn.disabled = true;
+      btn.textContent = '🧪 Testing...';
+      if (apiStatus) { apiStatus.textContent = 'Testing connection...'; apiStatus.className = 'api-status testing'; }
+
+      const settings = getCurrentAPISettings();
+      const ep = normalizeChatCompletionEndpoint(settings.endpoint);
+
+      const headers = { 'Content-Type': 'application/json' };
+      if (settings.key) headers['Authorization'] = `Bearer ${settings.key}`;
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 10000);
+
+      const body = {
+        model: settings.model || defaultModel,
+        messages: [
+          { role: 'system', content: 'Bạn là một AI assistant.' },
+          { role: 'user', content: "Hãy trả lời 'OK' nếu bạn nhận được tin nhắn này." }
+        ],
+        temperature: 0,
+        stream: false
+      };
+
+      const res = await fetch(ep, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+      clearTimeout(timer);
+
+      if (!res.ok) {
+        const txt = await res.text().catch(()=> '');
+        throw new Error(`HTTP ${res.status} ${res.statusText} - ${txt.slice(0,300)}`);
+      }
+
+      const data = await res.json().catch(()=> ({}));
+      const msg = data?.choices?.[0]?.message?.content || '';
+      if (apiStatus) {
+        apiStatus.textContent = '✅ Connected' + (msg ? `: ${String(msg).slice(0,60)}` : '');
+        apiStatus.className = 'api-status success';
+      }
+      saveAPISettingsToStorage();
+
+    } catch (error) {
+      console.error('API connection test failed:', error);
+      const hint = String(error?.message || '').includes('Failed to fetch')
+        ? 'Có thể do CORS, mixed content, hoặc server không chạy.'
+        : '';
+      if (apiStatus) { apiStatus.textContent = '❌ Connection failed. ' + hint; apiStatus.className = 'api-status error'; }
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '🧪 Test API'; }
+    }
+  }
+
+  if (testApiBtn) testApiBtn.addEventListener('click', testAPIConnection);
+
+  // State
+  let files = [];
+  let results = []; // [{ filename, imgDataURL, chinese, english, vietnamese }]
+
+  // DnD
+  dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.style.backgroundColor = 'rgba(52,152,219,.2)'; });
+  dropArea.addEventListener('dragleave', () => { dropArea.style.backgroundColor = ''; });
+  dropArea.addEventListener('drop', (e) => {
+    e.preventDefault(); dropArea.style.backgroundColor = '';
+    handleFiles(e.dataTransfer.files);
+  });
+
+  // Browse
+  browseButton.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.webkitdirectory = true;
+    input.addEventListener('change', () => handleFiles(input.files));
+    input.click();
+  });
+
+  processButton.addEventListener('click', processImages);
+  clearButton.addEventListener('click', clearAll);
+  exportButton.addEventListener('click', exportToExcel);
+
+  function handleFiles(fileListIn) {
+    for (let i = 0; i < fileListIn.length; i++) {
+      const f = fileListIn[i];
+      if (f.type.startsWith('image/')) files.push(f);
+    }
+    updateFileList();
+  }
+
+  function updateFileList() {
+    fileList.innerHTML = '';
+    if (files.length === 0) {
+      fileList.innerHTML = '<p class="empty-message">Chưa có file nào được thêm vào</p>';
+      return;
+    }
+    files.forEach((file, index) => {
+      const item = document.createElement('div');
+      item.className = 'file-item';
+      item.innerHTML = `<span>${file.name}</span><button class="remove-btn" data-index="${index}">Xóa</button>`;
+      fileList.appendChild(item);
+    });
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.getAttribute('data-index'));
+        files.splice(idx, 1);
+        updateFileList();
+      });
+    });
+  }
+
+  // Chỉ chuyển đổi file thành dataURL, không resize
+  async function fileToDataURL(file) {
+    return new Promise((resolve) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.readAsDataURL(file);
+    });
+  }
+
+  function hasChinese(text) {
+    return /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/.test(text);
+  }
+
+  // Helper function to convert File to base64
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Hàm scanImage để nhận dạng chữ Trung Quốc
+  async function scanImage(file) {
+    try {
+      const settings = getCurrentAPISettings();
+      const API_ENDPOINT = normalizeChatCompletionEndpoint(settings.endpoint);
+      const MODEL_NAME = settings.model || defaultModel;
+      
+      // Convert file to base64
+      const base64Image = await fileToBase64(file);
+      
+      // Call API
+      const headers = { 'Content-Type': 'application/json' };
+      if (settings.key) headers['Authorization'] = `Bearer ${settings.key}`;
+      
+      const response = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          model: MODEL_NAME,
+          messages: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: 'Identify any Chinese texts in this image. The result must be returned in JSON array format which are found text and there is no any other content. If none exist, return an empty JSON array. for example: ["你好", "世界"]'
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: base64Image
+                  }
+                }
+              ],
+            },
+          ],
+        })
+      });
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      
+      // Try to parse JSON from the response
+      try {
+        return JSON.parse(content);
+      } catch (e) {
+        // If parsing fails, try to extract JSON array from the text
+        const match = content.match(/\[.*\]/s);
+        if (match) {
+          return JSON.parse(match[0]);
+        }
+        return [];
+      }
+    } catch (error) {
+      console.error('Error scanning image:', error);
+      throw error;
+    }
+  }
+
+  // Chia đoạn an toàn cho model
+  function splitForModel(text, maxLen = 1500) {
+    const lines = String(text ?? '').split('\n');
+    const chunks = [];
+    let cur = '';
+    for (const line of lines) {
+      const withLine = cur ? cur + '\n' + line : line;
+      if (withLine.length > maxLen && cur) {
+        chunks.push(cur);
+        cur = line;
+      } else {
+        cur = withLine;
+      }
+    }
+    if (cur) chunks.push(cur);
+    return chunks;
+  }
+
+  // Gọi API custom có timeout + stream:false
+  async function callCustomAITranslate(chunk, target) {
+    const settings = getCurrentAPISettings();
+    const ep = normalizeChatCompletionEndpoint(settings.endpoint);
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (settings.key) headers['Authorization'] = `Bearer ${settings.key}`;
+
+    const role_instruction = "Bạn là công cụ dịch. Nhiệm vụ: dịch chính xác văn bản tiếng Trung.";
+    const instruction =
+`Hãy dịch sang ${target === 'vi' ? 'tiếng Việt' : 'tiếng Anh'}.
+Yêu cầu: giữ nguyên số dòng và xuống dòng, không thêm giải thích.
+Văn bản:
+${chunk}`;
+
+    const body = {
+      model: settings.model || defaultModel,
+      messages: [
+        { role: 'system', content: role_instruction },
+        { role: 'user', content: instruction }
+      ],
+      temperature: 0,
+      stream: false
+    };
+
+    const controller = new AbortController();
+    const req = fetch(ep, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+
+    const res = await withTimeout(req, 25000, controller);
+    if (!res.ok) {
+      const txt = await res.text().catch(()=> '');
+      throw new Error(`HTTP ${res.status} - ${txt.slice(0,300)}`);
+    }
+
+    const data = await res.json().catch(()=> ({}));
+    const out = data?.choices?.[0]?.message?.content?.trim();
+    if (!out) throw new Error('Empty AI response');
+    return out;
+  }
+
+  // Không để 1 chunk lỗi làm kẹt toàn bộ
+  async function translateCustomAI(text, target) {
+    const chunks = splitForModel(text, 1500);
+    const outs = [];
+    for (const ck of chunks) {
+      try {
+        const t = await callCustomAITranslate(ck, target);
+        outs.push(t);
+      } catch (e) {
+        console.error('Custom AI chunk failed:', e);
+        outs.push('(Dịch thất bại từ AI ở một đoạn)');
+      }
+    }
+    saveAPISettingsToStorage();
+    return outs.join('\n');
+  }
+
+  async function translateText(text, target) {
+    return await translateCustomAI(text, target);
+  }
+
+  async function processImages() {
+    if (files.length === 0) {
+      alert('Vui lòng chọn ít nhất một hình ảnh!');
+      return;
+    }
+    
+    progressBar.style.width = '0%';
+    resultsContainer.innerHTML = '';
+    results = [];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      progressBar.style.width = `${((i + 1) / files.length) * 100}%`;
+      
+      try {
+        // Thêm hiển thị hình ảnh và kiểm tra tiếng Trung
+        const dataURL = await fileToDataURL(file);
+        const chineseArray = await scanImage(file);
+        const chineseText = Array.isArray(chineseArray) ? chineseArray.join('\n') : '';
+        
+        // Kiểm tra nếu không có tiếng Trung thì bỏ qua
+        if (!chineseText || !hasChinese(chineseText)) {
+          displayNoChineseResult(file, dataURL);
+          continue;
+        }
+        
+        const [englishText, vietnameseText] = await Promise.all([
+          translateText(chineseText, 'en'),
+          translateText(chineseText, 'vi')
+        ]);
+        
+        const result = {
+          filename: file.name,
+          imgDataURL: dataURL,
+          chinese: chineseText,
+          english: englishText,
+          vietnamese: vietnameseText
+        };
+        
+        results.push(result);
+        displayResult(result);
+        
+      } catch (error) {
+        console.error(`Error processing ${file.name}:`, error);
+        displayErrorResult(file, error);
+      }
+    }
+    
+    progressBar.style.width = '100%';
+  }
+
+  function displayNoChineseResult(file, dataURL) {
+    const resultElement = document.createElement('div');
+    resultElement.className = 'result-item';
+    
+    resultElement.innerHTML = `
+      <div class="result-header">
+        <span class="filename">${file.name}</span>
+        <span class="language-tag chinese-tag">Không có tiếng Trung</span>
+      </div>
+      <img src="${dataURL}" alt="${file.name}" class="image-preview">
+      <div class="no-chinese-message">
+        Không tìm thấy văn bản tiếng Trung trong hình ảnh này
+      </div>
+    `;
+    
+    resultsContainer.appendChild(resultElement);
+  }
+
+  function displayErrorResult(file, error) {
+    const resultElement = document.createElement('div');
+    resultElement.className = 'result-item';
+    
+    resultElement.innerHTML = `
+      <div class="result-header">
+        <span class="filename">${file.name}</span>
+        <span class="language-tag chinese-tag">Lỗi xử lý</span>
+      </div>
+      <div class="no-chinese-message">
+        Đã xảy ra lỗi khi xử lý hình ảnh: ${error.message || 'Lỗi không xác định'}
+      </div>
+    `;
+    
+    resultsContainer.appendChild(resultElement);
+  }
+
+  function displayResult(result) {
+    const resultElement = document.createElement('div');
+    resultElement.className = 'result-item';
+    
+    resultElement.innerHTML = `
+      <div class="result-header">
+        <span class="filename">${result.filename}</span>
+        <div>
+          <span class="language-tag chinese-tag">中文</span>
+          <span class="language-tag english-tag">EN</span>
+          <span class="language-tag vietnamese-tag">VI</span>
+        </div>
+      </div>
+      <img src="${result.imgDataURL}" alt="${result.filename}" class="image-preview">
+      <div class="text-block">
+        <div class="text-label">Văn bản gốc (Tiếng Trung):</div>
+        <div class="text-content">${result.chinese}
+          <button class="copy-btn" data-text="${result.chinese.replace(/"/g, '&quot;')}">Copy</button>
+        </div>
+      </div>
+      <div class="text-block">
+        <div class="text-label">Dịch Tiếng Anh:</div>
+        <div class="text-content">${result.english}
+          <button class="copy-btn" data-text="${result.english.replace(/"/g, '&quot;')}">Copy</button>
+        </div>
+      </div>
+      <div class="text-block">
+        <div class="text-label">Dịch Tiếng Việt:</div>
+        <div class="text-content">${result.vietnamese}
+          <button class="copy-btn" data-text="${result.vietnamese.replace(/"/g, '&quot;')}">Copy</button>
+        </div>
+      </div>
+    `;
+    
+    resultsContainer.appendChild(resultElement);
+    
+    resultElement.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const text = btn.getAttribute('data-text');
+        navigator.clipboard.writeText(text).then(() => {
+          const originalText = btn.textContent;
+          btn.textContent = 'Đã copy!';
+          setTimeout(() => { btn.textContent = originalText; }, 2000);
+        });
+      });
+    });
+  }
+
+  function clearAll() {
+    files = [];
+    results = [];
+    updateFileList();
+    resultsContainer.innerHTML = '<p class="empty-message">Kết quả dịch sẽ hiển thị ở đây</p>';
+    progressBar.style.width = '0%';
+  }
+
+  async function exportToExcel() {
+    if (results.length === 0) { alert('Không có dữ liệu để xuất!'); return; }
+    const safe = v => {
+      const s = String(v ?? '');
+      return /^[=\-+@]/.test(s) ? "'" + s : s;
+    };
+    try {
+      const wsData = [
+        ['filename', 'image_dataURL', 'chinese', 'english', 'vietnamese'],
+        ...results.map(r => [ safe(r.filename), r.imgDataURL, safe(r.chinese), safe(r.english), safe(r.vietnamese) ])
+      ];
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      ws['!cols'] = [{wch:28},{wch:40},{wch:60},{wch:60},{wch:60}];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Translations');
+      const fname = `translations_${new Date().toISOString().slice(0,10)}.xlsx`;
+      try {
+        XLSX.writeFile(wb, fname, { bookType: 'xlsx', compression: true });
+      } catch (e) {
+        console.warn('writeFile failed, using fallback', e);
+        const ab = XLSX.write(wb, { bookType: 'xlsx', type: 'array', compression: true });
+        const blob = new Blob([ab], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fname;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
+      }
+    } catch(err) {
+      console.error('Xuất Excel lỗi:', err);
+      alert('Xuất Excel thất bại. Xem console để biết chi tiết.');
+    }
+  }
+
+});
+</script>
+
+</body>
+</html>
